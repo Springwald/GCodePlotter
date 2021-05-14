@@ -1,0 +1,84 @@
+﻿<Window xmlns:Controls="clr-namespace:GCodePlotter.Controls" 
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GCodeFontPainter"
+        xmlns:GCodePlotter="clr-namespace:GCodePlotter" x:Class="GCodeFontPainter.MainWindow"
+        mc:Ignorable="d"
+        Title="GCode Plotter" Width="1200" Height="900">
+    <Grid >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="40*"></ColumnDefinition>
+            <ColumnDefinition Width="60*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0">
+            <StackPanel Margin="10">
+                <GroupBox>
+                    <GroupBox.Header>
+                        <Label FontSize="18" FontWeight="Bold">Plot</Label>
+                    </GroupBox.Header>
+                    <StackPanel>
+                        <Label>Plotter COM port:</Label>
+                        <TextBox Name="ComPortInput" Text="COM6"/>
+                        <Button Content="Simulate" Name="ButtonSimulate"  Margin="5" Click="ButtonSimulate_Click"/>
+                        <Button Content="Plot"  Name="ButtonPlot" Margin="5" Click="ButtonPlot_Click" Background="#FFCBFCCD"/>
+                        <Button Content="Cancel" Name="ButtonCancel" Margin="5"  Background="#FFFCBABA" IsEnabled="False" Click="ButtonCancel_Click"/>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+            <ScrollViewer Name="Editor">
+                <StackPanel Grid.Column="0" Margin="10">
+                    <GroupBox>
+                        <GroupBox.Header>
+                            <Label FontSize="18" FontWeight="Bold">Drawing area</Label>
+                        </GroupBox.Header>
+                        <StackPanel>
+                            <Label>Width in millimeter:</Label>
+                            <TextBox Name="WidthInput" Text="140" PreviewTextInput="NumberValidationTextBox" TextChanged="SizesChanged"/>
+                            <Label>Height in millimeter:</Label>
+                            <TextBox Name="HeightInput" Text="210" PreviewTextInput="NumberValidationTextBox" TextChanged="SizesChanged"/>
+                            <Label>Raster in millimeter:</Label>
+                            <TextBox Name="RasterSizeInput" Text="5" PreviewTextInput="NumberValidationTextBox" TextChanged="SizesChanged"/>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox>
+                        <GroupBox.Header>
+                            <Label FontSize="18" FontWeight="Bold">Font</Label>
+                        </GroupBox.Header>
+                        <StackPanel>
+                            <Label>Font size:</Label>
+                            <TextBox Name="FontSizeInput" Text="9" PreviewTextInput="NumberValidationTextBox" TextChanged="ValuesChanged"/>
+                            <Label>Font name:</Label>
+                            <Controls:FontSelector x:Name="MyFontSelector" FontChanged="MyFontSelector_FontChanged"   />
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox>
+                        <GroupBox.Header>
+                            <Label FontSize="18" FontWeight="Bold">Text to plot</Label>
+                        </GroupBox.Header>
+                        <TextBox TextWrapping="Wrap" 
+                             HorizontalContentAlignment="Stretch" 
+                             FontSize="14px" 
+                             MinHeight="300" 
+                             VerticalScrollBarVisibility="Visible"
+                             AcceptsReturn="True"
+                             Name="TextInput"
+                             TextChanged="ValuesChanged"
+                             xml:space="preserve">Lorem ipsum dolor sit amet,
+consetetur sadipscing elitr,
+sed diam nonumy eirmod tempor
+invidunt ut labore et dolore
+magna aliquyam erat, sed diam voluptua.
+                        </TextBox>
+                    </GroupBox>
+
+                </StackPanel>
+            </ScrollViewer>
+        </StackPanel>
+        <GCodePlotter:PreviewRenderer x:Name="MyPreviewRenderer"  Grid.Column="1" />
+
+    </Grid>
+</Window>
