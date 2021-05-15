@@ -32,6 +32,11 @@ namespace GCodePlotter.Plotting
         public double LineWidthMillimeters { get; set; } = 140;
 
         /// <summary>
+        /// Wrap text before reaching the line width?
+        /// </summary>
+        public bool LineWrap { get; set; } = true;
+
+        /// <summary>
         /// the font name e.g. "Arial".
         /// </summary>
         public string FontName { get; set; } = "Arial";

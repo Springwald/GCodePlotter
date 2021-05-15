@@ -44,7 +44,7 @@ namespace GCodePlotter.Plotting
         /// </summary>
         private IEnumerable<PlotPath> CreatePaths(PlotJob plotJob)
         {
-            var lines = this.textWrapCalculator.CalculateLines(plotJob.Text, plotJob.LineWidthMillimeters);
+            var lines = this.textWrapCalculator.CalculateLines(plotJob.Text, plotJob.LineWidthMillimeters, plotJob.LineWrap).ToArray();
             var y = 0d;
             foreach (var line in lines)
             {
