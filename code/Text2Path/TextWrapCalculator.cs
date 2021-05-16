@@ -65,12 +65,7 @@ namespace GCodePlotter.Text2Path
 
         private double GetWidth(string text)
         {
-            var paths = this.pathCreator.CreatePathsFromText(text, 0);
-            double wordWidth = 0;
-            foreach (var p in paths)
-                foreach (var po in p.Points)
-                    wordWidth = Math.Max(wordWidth, po.X);
-            return wordWidth;
+            return this.pathCreator.CreatePathsFromText(text, 0).Width;
         }
     }
 }

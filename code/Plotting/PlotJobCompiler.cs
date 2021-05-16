@@ -48,8 +48,8 @@ namespace GCodePlotter.Plotting
             var y = 0d;
             foreach (var line in lines)
             {
-                var paths = pathCreator.CreatePathsFromText(line, y);
-                foreach (var path in paths) yield return path;
+                var result = pathCreator.CreatePathsFromText(line, y);
+                foreach (var path in result.Paths) yield return path;
                 y += plotJob.FontSizeMillimeters;
             }
         }

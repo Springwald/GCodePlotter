@@ -1,0 +1,62 @@
+﻿<UserControl x:Class="GCodePlotter.Controls.ManualMove"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GCodePlotter.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="350" d:DesignWidth="500">
+    <StackPanel>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right">Actual Pos:</Label>
+            <Label Name="LabelActualPos" Grid.Row="0" Grid.Column="1" FontWeight="Bold">100/100</Label>
+        </Grid>
+        <Button Grid.Row="0" Grid.Column="2" Content="Use as start pos" Name="ButtonUseAsStartPos"  Margin="5"/>
+
+        <Label>Manual move:</Label>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center">X:</Label>
+            <TextBox Grid.Row="0" Grid.Column="1" Name="TargetPosXInput" VerticalAlignment="Center" Text="10"/>
+            <Label Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" >Y:</Label>
+            <TextBox Grid.Row="0" Grid.Column="3" Name="TargetPosYInput" Text="140" VerticalAlignment="Center"/>
+            <Button Grid.Row="0" Grid.Column="5" Content="move"/>
+        </Grid>
+        <Grid Margin="0 10 0 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0" Grid.Column="2" Content="Y -50"></Button>
+            <Button Grid.Row="1" Grid.Column="2" Content="Y -10"></Button>
+            <Button Grid.Row="2" Grid.Column="0" Content="X -50"></Button>
+            <Button Grid.Row="2" Grid.Column="1" Content="X -10"></Button>
+            <Button Grid.Row="2" Grid.Column="3" Content="X +10"></Button>
+            <Button Grid.Row="2" Grid.Column="4" Content="X +50"></Button>
+            <Button Grid.Row="3" Grid.Column="2" Content="Y +10"></Button>
+            <Button Grid.Row="4" Grid.Column="2" Content="Y +50"></Button>
+        </Grid>
+    </StackPanel>
+</UserControl>

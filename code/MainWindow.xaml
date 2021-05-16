@@ -12,24 +12,53 @@
             <ColumnDefinition Width="40*"></ColumnDefinition>
             <ColumnDefinition Width="60*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="0">
-            <StackPanel Margin="10">
-                <GroupBox>
-                    <GroupBox.Header>
-                        <Label FontSize="18" FontWeight="Bold">Plot</Label>
-                    </GroupBox.Header>
-                    <StackPanel>
-                        <Label>Plotter COM port:</Label>
-                        <TextBox Name="ComPortInput" Text="COM6"/>
-                        <Button Content="Simulate" Name="ButtonSimulate"  Margin="5" Click="ButtonSimulate_Click"/>
-                        <Button Content="Plot"  Name="ButtonPlot" Margin="5" Click="ButtonPlot_Click" Background="#FFCBFCCD"/>
-                        <Button Content="Cancel" Name="ButtonCancel" Margin="5"  Background="#FFFCBABA" IsEnabled="False" Click="ButtonCancel_Click"/>
-                    </StackPanel>
-                </GroupBox>
-            </StackPanel>
-            <ScrollViewer Name="Editor">
-                <StackPanel Grid.Column="0" Margin="10">
-                    <GroupBox>
+        <ScrollViewer>
+            <StackPanel Grid.Column="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Grid.Column="0">
+                        <GroupBox.Header>
+                            <Label FontSize="18" FontWeight="Bold">Plot</Label>
+                        </GroupBox.Header>
+                        <StackPanel>
+                            <Label>Plotter COM port:</Label>
+                            <TextBox Name="ComPortInput" Text="COM6"/>
+                            <Label>Start position in mm:</Label>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center">X:</Label>
+                                <TextBox Grid.Row="0" Grid.Column="1" Name="StartPosXInput" VerticalAlignment="Center" Text="10"/>
+                                <Label Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" >Y:</Label>
+                                <TextBox Grid.Row="0" Grid.Column="3" Name="StartPosYInput" Text="140" VerticalAlignment="Center"/>
+                            </Grid>
+
+                            <Button Content="Simulate" Name="ButtonSimulate"  Margin="5" Click="ButtonSimulate_Click"/>
+                            <Button Content="Plot"  Name="ButtonPlot" Margin="5" Click="ButtonPlot_Click" Background="#FFCBFCCD"/>
+                            <Button Content="Cancel" Name="ButtonCancel" Margin="5"  Background="#FFFCBABA" IsEnabled="False" Click="ButtonCancel_Click"/>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Grid.Column="1">
+                        <GroupBox.Header>
+                            <Label FontSize="18" FontWeight="Bold">Position</Label>
+                        </GroupBox.Header>
+                        <Controls:ManualMove x:Name="ManualMover"/>
+
+                    </GroupBox>
+                </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Grid.Row="0" Grid.Column="0">
                         <GroupBox.Header>
                             <Label FontSize="18" FontWeight="Bold">Drawing area</Label>
                         </GroupBox.Header>
@@ -40,10 +69,12 @@
                             <TextBox Name="HeightInput" Text="210" PreviewTextInput="NumberValidationTextBox" TextChanged="SizesChanged"/>
                             <Label>Raster in millimeter:</Label>
                             <TextBox Name="RasterSizeInput" Text="5" PreviewTextInput="NumberValidationTextBox" TextChanged="SizesChanged"/>
+                            <Label>Wrap text:</Label>
+                            <CheckBox Content="wrap text at end of line" Name="WrapTextInput" IsChecked="True" />
                         </StackPanel>
                     </GroupBox>
 
-                    <GroupBox>
+                    <GroupBox Grid.Row="0" Grid.Column="1">
                         <GroupBox.Header>
                             <Label FontSize="18" FontWeight="Bold">Font</Label>
                         </GroupBox.Header>
@@ -54,16 +85,14 @@
                             <Controls:FontSelector x:Name="MyFontSelector" FontChanged="MyFontSelector_FontChanged"   />
                         </StackPanel>
                     </GroupBox>
-
-                    <GroupBox>
-                        <GroupBox.Header>
-                            <Label FontSize="18" FontWeight="Bold">Text to plot</Label>
-                        </GroupBox.Header>
-                        <TextBox TextWrapping="Wrap" 
+                </Grid>
+                <GroupBox Name="Editor">
+                    <GroupBox.Header>
+                        <Label FontSize="18" FontWeight="Bold">Text to plot</Label>
+                    </GroupBox.Header>
+                    <TextBox TextWrapping="Wrap" 
                              HorizontalContentAlignment="Stretch" 
                              FontSize="14px" 
-                             MinHeight="300" 
-                             VerticalScrollBarVisibility="Visible"
                              AcceptsReturn="True"
                              Name="TextInput"
                              TextChanged="ValuesChanged"
@@ -72,12 +101,9 @@ dolor sit amet,
 consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
                         </TextBox>
-                    </GroupBox>
-
-                </StackPanel>
-            </ScrollViewer>
-        </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
         <GCodePlotter:PreviewRenderer x:Name="MyPreviewRenderer"  Grid.Column="1" />
-
     </Grid>
 </Window>
