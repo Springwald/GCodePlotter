@@ -19,7 +19,10 @@ namespace GCodePlotter.Controls
     /// </summary>
     public partial class FontSelector : UserControl
     {
-        private string[] preferredFonts = { "PremiumUltra63SL", "1CAMBam_Stick_9" };
+        private string[] preferredFonts = { 
+           // "Arial", 
+            "PremiumUltra63SL", 
+            "1CAMBam_Stick_9" };
 
         public string FontName
         {

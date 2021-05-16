@@ -47,6 +47,50 @@ namespace GCodePlotter.Text2Path
             return result;
         }
 
+        private IEnumerable<PlotPoint> SimplifyPathsPoints(PlotPoint[] points)
+        {
+            //var points = SimplifyPath.Simplify(pointsRaw.ToList(), epsilon: 0f).ToArray();
+
+            //foreach (var p in points) yield return p;
+            //yield break;
+
+           //ar points = SimplifyPath.Simplify(pointsRaw.ToList(), epsilon: 0f).ToArray();
+
+            //if (points.Length < 3)
+            {
+                foreach (var p in points) yield return p;
+                yield break;
+            }
+
+            yield return points.First();
+
+            var lastGradient = 0d;
+            var gradientLastToActual = 0d;
+
+            for (int i = 0; i < points.Length - 1; i++)
+            {
+                var x = (points[i + 1].X - points[i].X);
+                var y = (points[i + 1].Y - points[i].Y);
+                if (y == 0)
+                {
+                    gradientLastToActual = double.PositiveInfinity;
+                }
+                else
+                {
+                    gradientLastToActual = x / y;
+                }
+
+                var diff = Math.Abs(gradientLastToActual - lastGradient);
+                if (i == 0 || diff >= 0)
+                {
+                    yield return points[i + 1];
+                }
+                lastGradient = gradientLastToActual;
+            }
+
+            yield return points.Last(); ;
+        }
+
         private IEnumerable<PlotPath> CreatePathsFromTextInternal(string text, double startY)
         {
             using (Font font = new Font(this.FontName, (int)(this.FontSizeMillimeter), GraphicsUnit.Pixel))
@@ -60,40 +104,49 @@ namespace GCodePlotter.Text2Path
                 PlotPoint lastPoint = null;
                 byte type;
 
-                for (int i = 0; i < gp.PathData.Points.Length; i++)
+                if (gp.PathData.Points.Length > 0)
                 {
-                    type = gp.PathData.Types[i];
-                    point = gp.PathData.Points[i];
-
-                    switch (type)
+                    for (int i = 0; i < gp.PathData.Points.Length; i++)
                     {
-                        case 0: // Indicates that the point is the start of a figure.
-                            if (linePoints.Any()) yield return new PlotPath { Points = linePoints.ToArray() };
-                            linePoints.Clear();
-                            lastPoint = new PlotPoint { X = point.X, Y = point.Y + startY };
-                            linePoints.Add(lastPoint);
-                            break;
+                        type = gp.PathData.Types[i];
+                        point = gp.PathData.Points[i];
 
-                        // case 0x20: // Specifies that the point is a marker.
-                        // case 1: // Indicates that the point is one of the two endpoints of a line.
-                        // case 3: // Indicates that the point is an endpoint or control point of a cubic Bézier spline.
-                        // case 0x80: // Specifies that the point is the last point in a closed subpath (figure).
-                        //    break;
+                        switch (type)
+                        {
+                            case 0: // Indicates that the point is the start of a figure.
+                                if (linePoints.Any())
+                                {
+                                    var simplyfied = this.SimplifyPathsPoints(linePoints.ToArray());
+                                    yield return new PlotPath { Points = simplyfied.ToArray() };
+                                }
+                                linePoints.Clear();
+                                lastPoint = new PlotPoint { X = point.X, Y = point.Y + startY };
+                                linePoints.Add(lastPoint);
+                                break;
 
-                        default:
-                            lastPoint = new PlotPoint { X = point.X, Y = point.Y + startY };
-                            linePoints.Add(lastPoint);
-                            break;
+                            // case 0x20: // Specifies that the point is a marker.
+                            // case 1: // Indicates that the point is one of the two endpoints of a line.
+                            // case 3: // Indicates that the point is an endpoint or control point of a cubic Bézier spline.
+                            // case 0x80: // Specifies that the point is the last point in a closed subpath (figure).
+                            //    break;
+
+                            default:
+                                lastPoint = new PlotPoint { X = point.X, Y = point.Y + startY };
+                                linePoints.Add(lastPoint);
+                                break;
+                        }
                     }
-                    
-                }
-                if (linePoints.Any())
-                {
-                    if (linePoints.Count == 1 && lastPoint != null && (lastPoint.X != linePoints[0].X || lastPoint.Y != linePoints[0].Y)) { 
-                        yield return new PlotPath { Points = new PlotPoint[] { lastPoint, linePoints[0] } };
-                    } else
+                    if (linePoints.Any())
                     {
-                        yield return new PlotPath { Points = linePoints.ToArray() };
+                        if (linePoints.Count == 1 && lastPoint != null && (lastPoint.X != linePoints[0].X || lastPoint.Y != linePoints[0].Y))
+                        {
+                            yield return new PlotPath { Points = new PlotPoint[] { lastPoint, linePoints[0] } };
+                        }
+                        else
+                        {
+                            var simplyfied = this.SimplifyPathsPoints(linePoints.ToArray());
+                            yield return new PlotPath { Points = simplyfied.ToArray() };
+                        }
                     }
                 }
             }

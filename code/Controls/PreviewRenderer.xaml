@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:GCodePlotter"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid  Background="Gray">
+    <Grid  Background="LightGray">
         <Grid Name="DrawingArea" Background="White">
             <Canvas x:Name="RasterCanvas" Background="Transparent"></Canvas>
             <Canvas x:Name="PreviewCanvas" Background="Transparent"></Canvas>

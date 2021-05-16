@@ -21,7 +21,7 @@ namespace GCodePlotter
     /// </summary>
     public partial class PreviewRenderer : UserControl
     {
-        double drawingAreaMargin = 10;
+        double drawingAreaMargin = 15;
 
         public Canvas PreviewCanvasElement => this.PreviewCanvas;
         public Canvas LiveCanvasElement => this.LiveCanvas;

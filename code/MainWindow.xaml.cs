@@ -100,18 +100,29 @@ namespace GCodeFontPainter
             if (!loaded) return;
             this.plotJobFromControlValues.Text = TextInput.Text;
             this.plotJobFromControlValues.FontName = this.MyFontSelector.FontName;
-            if (int.TryParse(this.FontSizeInput.Text, out int fontSize)) this.plotJobFromControlValues.FontSizeMillimeters = Math.Min(200,Math.Max(2, fontSize));
+            if (int.TryParse(this.FontSizeInput.Text, out int fontSize)) this.plotJobFromControlValues.FontSizeMillimeters = Math.Min(200, Math.Max(2, fontSize));
             await this.MyPreviewRenderer.ClearLiveView();
             await this.DrawPreview();
         }
 
         private async Task DrawPreview()
         {
+            if (plotterScreenPreview != null)  this.plotterScreenPreview.FastPreview = this.FastPreviewCheckbox.IsChecked == true;
             var counter = ++this.redrawPreviewCounter;
             await Task.Delay(200);
             if (counter != this.redrawPreviewCounter) return; // another preview request came meanwhile
             await this.MyPreviewRenderer.ClearPreview();
             await this.RunJob(new[] { plotterScreenPreview }, this.plotJobFromControlValues);
+        }
+
+        private async void FastPreviewCheckbox_Checked(object sender, RoutedEventArgs e)
+        {
+            if (plotterScreenPreview != null)
+            {
+                await this.MyPreviewRenderer.ClearPreview();
+                this.plotterScreenPreview.FastPreview = this.FastPreviewCheckbox.IsChecked == true;
+                await this.DrawPreview();
+            }
         }
 
         #region Action buttons
@@ -147,7 +158,7 @@ namespace GCodeFontPainter
                 this.ButtonPlot.IsEnabled = true;
             }
         }
-        
+
         /// <summary>
         /// Run the plot job on the real plotter hardware
         /// </summary>
@@ -217,10 +228,12 @@ namespace GCodeFontPainter
         {
             this.Editor.IsEnabled = !running;
             this.ButtonSimulate.IsEnabled = !running;
-            this.ButtonPlot.IsEnabled = this.plotterRealHardware != null &&  running == false;
+            this.ButtonPlot.IsEnabled = this.plotterRealHardware != null && running == false;
             this.ButtonCancel.IsEnabled = running;
         }
 
+
         #endregion
+
     }
 }

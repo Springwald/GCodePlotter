@@ -27,7 +27,7 @@
                             <Label>Plotter COM port:</Label>
                             <TextBox Name="ComPortInput" Text="COM6"/>
                             <Button Content="connect" Name="ButtonConnect"  Margin="5" Click="ButtonConnect_Click"/>
-                            
+
                             <Label>Start position in mm:</Label>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -108,6 +108,9 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
                 </GroupBox>
             </StackPanel>
         </ScrollViewer>
-        <GCodePlotter:PreviewRenderer x:Name="MyPreviewRenderer"  Grid.Column="1" />
+        <Grid Grid.Column="1" >
+            <GCodePlotter:PreviewRenderer x:Name="MyPreviewRenderer"   />
+            <CheckBox Content="fast preview" Margin="3" Name="FastPreviewCheckbox" IsChecked="True" Checked="FastPreviewCheckbox_Checked" Click="FastPreviewCheckbox_Checked" />
+        </Grid>
     </Grid>
 </Window>
