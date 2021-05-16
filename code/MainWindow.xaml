@@ -74,7 +74,7 @@
                             <Label>Raster in millimeter:</Label>
                             <TextBox Name="RasterSizeInput" Text="5" PreviewTextInput="NumberValidationTextBox" TextChanged="SizesChanged"/>
                             <Label>Wrap text:</Label>
-                            <CheckBox Content="wrap text at end of line" Name="WrapTextInput" IsChecked="True" />
+                            <CheckBox Content="wrap text at end of line" Name="WrapTextInput" IsChecked="True" Unchecked="WrapTextInput_Checked" Checked="WrapTextInput_Checked" />
                         </StackPanel>
                     </GroupBox>
 
@@ -110,7 +110,7 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
         </ScrollViewer>
         <Grid Grid.Column="1" >
             <GCodePlotter:PreviewRenderer x:Name="MyPreviewRenderer"   />
-            <CheckBox Content="fast preview" Margin="3" Name="FastPreviewCheckbox" IsChecked="True" Checked="FastPreviewCheckbox_Checked" Click="FastPreviewCheckbox_Checked" />
+            <CheckBox Content="fast preview" Margin="3" Name="FastPreviewCheckbox" Checked="FastPreviewCheckbox_Checked" Unchecked="FastPreviewCheckbox_Checked" />
         </Grid>
     </Grid>
 </Window>

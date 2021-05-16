@@ -45,6 +45,9 @@ namespace GCodePlotter.Plotter
 
         public async Task<PlotResult> PlotPath(double x, double y, PlotPath path)
         {
+            x = 0;
+            y = 0;
+
             var points = this.FastPreview && path.Points.Length > 2 ? this.SimplifyPathsPoints(path.Points).ToArray() : path.Points;
 
             var zoom = this.ZoomFactor;

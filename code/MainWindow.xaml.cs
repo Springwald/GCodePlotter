@@ -10,6 +10,7 @@
 using GCodePlotter.Plotter;
 using GCodePlotter.Plotting;
 using System;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
@@ -50,6 +51,7 @@ namespace GCodeFontPainter
             this.plotterScreenPreview = new ScreenPlotter(this.MyPreviewRenderer.PreviewCanvas, Brushes.Gray, strokeThickness: 1, "Preview plotter");
 
             this.loaded = true;
+            this.FastPreviewCheckbox.IsChecked = Debugger.IsAttached;
 
             await this.RecalculateSizes();
             await this.RecalculateJobValues();
@@ -125,6 +127,16 @@ namespace GCodeFontPainter
             }
         }
 
+        private async void WrapTextInput_Checked(object sender, RoutedEventArgs e)
+        {
+            if (plotterScreenPreview != null)
+            {
+                await this.MyPreviewRenderer.ClearPreview();
+                this.plotJobFromControlValues.LineWrap = this.WrapTextInput.IsChecked == true;
+                await this.DrawPreview();
+            }
+        }
+
         #region Action buttons
 
         /// <summary>
@@ -164,12 +176,13 @@ namespace GCodeFontPainter
         /// </summary>
         private async void ButtonPlot_Click(object sender, RoutedEventArgs e)
         {
-            this.plotterScreenLivePlot.DelayMsPerPath = 0;
+            this.plotterScreenLivePlot.DelayMsPerPath = 1;
 
             if (int.TryParse(this.StartPosXInput.Text, out int x))
             {
                 if (int.TryParse(this.StartPosYInput.Text, out int y))
                 {
+                    this.plotJobFromControlValues.Origin = new GCodePlotter.Text2Path.PlotPoint { X = x, Y = y };
                     await this.RunJob(new[] { plotterScreenLivePlot, plotterRealHardware }, this.plotJobFromControlValues);
                 }
             }
@@ -232,8 +245,11 @@ namespace GCodeFontPainter
             this.ButtonCancel.IsEnabled = running;
         }
 
+     
+
 
         #endregion
+
 
     }
 }

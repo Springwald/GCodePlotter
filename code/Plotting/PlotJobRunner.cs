@@ -35,11 +35,15 @@ namespace GCodePlotter.Plotting
             }
 
             foreach (var path in plotJob.Paths)
+            {
                 foreach (var plotter in plotters)
+                {
                     if (!this.canceled)
                     {
                         await plotter.PlotPath(plotJob.Origin.X, plotJob.Origin.Y, path);
                     }
+                }
+            }
 
             if (canceled)
             {
