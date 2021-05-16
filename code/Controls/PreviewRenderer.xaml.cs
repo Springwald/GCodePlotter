@@ -81,6 +81,9 @@ namespace GCodePlotter
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// paint the raster on the virtual preview paper
+        /// </summary>
         public async Task UpdateRaster()
         {
 

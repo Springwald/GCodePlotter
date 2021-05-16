@@ -19,6 +19,9 @@ using System.Windows.Shapes;
 
 namespace GCodePlotter.Plotter
 {
+    /// <summary>
+    /// virtual screen plotter
+    /// </summary>
     public class ScreenPlotter : IPlotter
     {
         private Canvas canvas;
@@ -29,8 +32,14 @@ namespace GCodePlotter.Plotter
 
         public double ZoomFactor { get; set; } = 1;
 
+        /// <summary>
+        /// verlustbehaftet aber schnell zeichnen
+        /// </summary>
         public bool FastPreview { get; set; } = false;
 
+        /// <summary>
+        /// Wait after painting a path?
+        /// </summary>
         public int DelayMsPerPath { get; set; }
 
         public ScreenPlotter(Canvas canvas, Brush paintBrush, double strokeThickness, string name)
@@ -41,8 +50,14 @@ namespace GCodePlotter.Plotter
             this.Name = name;
         }
 
+        /// <summary>
+        /// set up the virtual plotter up
+        /// </summary>
         public async Task<PlotResult> GetReady() { await Task.CompletedTask; return new PlotResult { Success = true }; }
 
+        /// <summary>
+        /// plot the virtual path in screen
+        /// </summary>
         public async Task<PlotResult> PlotPath(double x, double y, PlotPath path)
         {
             x = 0;
@@ -68,7 +83,9 @@ namespace GCodePlotter.Plotter
             return new PlotResult { Success = true };
         }
 
-
+        /// <summary>
+        /// enable fast path preview by less points in path
+        /// </summary>
         private IEnumerable<PlotPoint> SimplifyPathsPoints(PlotPoint[] points)
         {
             var tolerance = 0.51d;
@@ -108,19 +125,6 @@ namespace GCodePlotter.Plotter
             yield return points.Last(); ;
         }
 
-        private IEnumerable<PlotPoint> SimplifyPath(PlotPoint[] points)
-        {
-            var skipRate = 2;
-
-            yield return points.First();
-
-            for (int i=1; i < points.Length-skipRate; i+= skipRate)
-            {
-                yield return points[i];
-            }
-
-            yield return points.Last();
-        }
 
         public void CancelPlot() { }
 

@@ -7,9 +7,7 @@
 // All rights reserved
 // Licensed under MIT License
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace GCodePlotter.Text2Path
@@ -23,17 +21,20 @@ namespace GCodePlotter.Text2Path
             this.pathCreator = pathCreator;
         }
 
+        /// <summary>
+        /// convert text into lines
+        /// </summary>
         public IEnumerable<string> CalculateLines(string text, double lineWidthMillimeters, bool lineWrap)
         {
             if (string.IsNullOrWhiteSpace(text)) yield break;
             var lines = text.Split(new char[] { '\r', '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
-            var space = this.GetWidth("A A")-this.GetWidth("AA"); // workaround because " " alone is width 0
-            foreach(var line in lines)
+            var space = this.GetWidth("A A") - this.GetWidth("AA"); // workaround because " " alone is width 0
+            foreach (var line in lines)
             {
                 if (lineWrap) // Wrap text at end of line
                 {
                     var lineResult = new StringBuilder();
-                    var words = line.Split(new char[] { ' '});
+                    var words = line.Split(new char[] { ' ' });
                     double x = 0;
                     foreach (var word in words)
                     {
@@ -53,7 +54,7 @@ namespace GCodePlotter.Text2Path
                             lineResult.Append($" {word}");
                             x += space + wordWidth;
                         }
-                     }
+                    }
                     if (lineResult.Length > 0) yield return lineResult.ToString();
                 }
                 else // don't wrap text at end of line

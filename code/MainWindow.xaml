@@ -110,7 +110,7 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
         </ScrollViewer>
         <Grid Grid.Column="1" >
             <GCodePlotter:PreviewRenderer x:Name="MyPreviewRenderer"   />
-            <CheckBox Content="fast preview" Margin="3" Name="FastPreviewCheckbox" Checked="FastPreviewCheckbox_Checked" Unchecked="FastPreviewCheckbox_Checked" />
+            <CheckBox Content="fast preview (lossy but fast)" Margin="3" Name="FastPreviewCheckbox" Checked="FastPreviewCheckbox_Checked" Unchecked="FastPreviewCheckbox_Checked" />
         </Grid>
     </Grid>
 </Window>

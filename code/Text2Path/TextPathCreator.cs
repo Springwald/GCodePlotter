@@ -33,6 +33,10 @@ namespace GCodePlotter.Text2Path
 
         private Point zeroPoint = new Point(0, 0);
 
+
+        /// <summary>
+        /// convert text to graphic path result
+        /// </summary>
         public TextPathResult CreatePathsFromText(string text, double startY)
         {
             var key = $"{FontName}-{FontSizeMillimeter}-{startY}-{text}";
@@ -47,49 +51,9 @@ namespace GCodePlotter.Text2Path
             return result;
         }
 
-        private IEnumerable<PlotPoint> SimplifyPathsPoints(PlotPoint[] points)
-        {
-            //var points = SimplifyPath.Simplify(pointsRaw.ToList(), epsilon: 0f).ToArray();
-
-            //foreach (var p in points) yield return p;
-            //yield break;
-
-           //ar points = SimplifyPath.Simplify(pointsRaw.ToList(), epsilon: 0f).ToArray();
-
-            //if (points.Length < 3)
-            {
-                foreach (var p in points) yield return p;
-                yield break;
-            }
-
-            yield return points.First();
-
-            var lastGradient = 0d;
-            var gradientLastToActual = 0d;
-
-            for (int i = 0; i < points.Length - 1; i++)
-            {
-                var x = (points[i + 1].X - points[i].X);
-                var y = (points[i + 1].Y - points[i].Y);
-                if (y == 0)
-                {
-                    gradientLastToActual = double.PositiveInfinity;
-                }
-                else
-                {
-                    gradientLastToActual = x / y;
-                }
-
-                var diff = Math.Abs(gradientLastToActual - lastGradient);
-                if (i == 0 || diff >= 0)
-                {
-                    yield return points[i + 1];
-                }
-                lastGradient = gradientLastToActual;
-            }
-
-            yield return points.Last(); ;
-        }
+        /// <summary>
+        /// Convert text to graphic path
+        /// </summary>
 
         private IEnumerable<PlotPath> CreatePathsFromTextInternal(string text, double startY)
         {
@@ -116,8 +80,7 @@ namespace GCodePlotter.Text2Path
                             case 0: // Indicates that the point is the start of a figure.
                                 if (linePoints.Any())
                                 {
-                                    var simplyfied = this.SimplifyPathsPoints(linePoints.ToArray());
-                                    yield return new PlotPath { Points = simplyfied.ToArray() };
+                                    yield return new PlotPath { Points = linePoints.ToArray() };
                                 }
                                 linePoints.Clear();
                                 lastPoint = new PlotPoint { X = point.X, Y = point.Y + startY };
@@ -144,14 +107,16 @@ namespace GCodePlotter.Text2Path
                         }
                         else
                         {
-                            var simplyfied = this.SimplifyPathsPoints(linePoints.ToArray());
-                            yield return new PlotPath { Points = simplyfied.ToArray() };
+                            yield return new PlotPath { Points = linePoints.ToArray() };
                         }
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// calculate the pixel width of the given text
+        /// </summary>
         private double GetWidth(string text)
         {
             var paths = this.CreatePathsFromTextInternal(text, 0);

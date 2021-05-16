@@ -50,7 +50,7 @@ namespace GCodePlotter.Plotting
             {
                 var result = pathCreator.CreatePathsFromText(line, y);
                 foreach (var path in result.Paths) yield return path;
-                y += plotJob.FontSizeMillimeters;
+                y += plotJob.FontSizeMillimeters * .9d;
             }
         }
 

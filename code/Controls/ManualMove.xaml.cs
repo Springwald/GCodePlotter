@@ -23,6 +23,9 @@ namespace GCodePlotter.Controls
     {
         public IManualMovable Plotter { get; set; }
 
+        /// <summary>
+        /// the actual pen pos x
+        /// </summary>
         public double ActualX
         {
             get
@@ -36,6 +39,9 @@ namespace GCodePlotter.Controls
             }
         }
 
+        /// <summary>
+        /// the actual pen pos y
+        /// </summary>
         public double ActualY
         {
             get
@@ -49,17 +55,24 @@ namespace GCodePlotter.Controls
             }
         }
 
+
         public ManualMove()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// only allow integer inputs
+        /// </summary>
         private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
         {
             Regex regex = new Regex("[^0-9]+");
             e.Handled = regex.IsMatch(e.Text);
         }
 
+        /// <summary>
+        /// movel pen to input position
+        /// </summary>
         private async void ButtonMove_Click(object sender, RoutedEventArgs e)
         {
             this.IsEnabled = false;
@@ -73,6 +86,9 @@ namespace GCodePlotter.Controls
             this.IsEnabled = true;
         }
 
+        /// <summary>
+        /// move pen to absolute position
+        /// </summary>
         private async Task MoveTo(double x, double y)
         {
             this.IsEnabled = false;
@@ -89,6 +105,14 @@ namespace GCodePlotter.Controls
             this.IsEnabled = true;
         }
 
+        /// <summary>
+        /// move the pen relative to actual pen pos
+        /// </summary>
+        private async Task MoveToRelative(double x, double y) => await this.MoveTo(this.ActualX + x, this.ActualY + y);
+
+        /// <summary>
+        /// auto home the plotter
+        /// </summary>
         private async void ButtonAutoHome_Click(object sender, RoutedEventArgs e)
         {
             this.IsEnabled = false;
@@ -105,7 +129,7 @@ namespace GCodePlotter.Controls
             this.IsEnabled = true;
         }
 
-        private async Task MoveToRelative(double x, double y) => await this.MoveTo(this.ActualX + x, this.ActualY + y);
+        
 
         private async void ButtonYMinus50_Click(object sender, RoutedEventArgs e) => await this.MoveToRelative(0, -50);
         private async void ButtonYMinus10_Click(object sender, RoutedEventArgs e) => await this.MoveToRelative(0, -10);

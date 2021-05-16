@@ -19,7 +19,7 @@ namespace GCodeFontPainter
         public enum Pens { up, down };
 
         private SerialPort comport;
-        private bool gotOk;
+        private bool receivedSerialOkResult;
 
         public bool PenIsUp { get; private set; }
 
@@ -81,8 +81,8 @@ namespace GCodeFontPainter
         {
             Debug.WriteLine(command);
             this.comport.WriteLine(command);
-            while (!this.gotOk) await Task.Delay(1);
-            this.gotOk = false;
+            while (!this.receivedSerialOkResult) await Task.Delay(1);
+            this.receivedSerialOkResult = false;
         }
 
         private void Comport_DataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -90,7 +90,7 @@ namespace GCodeFontPainter
             if (comport.BytesToRead != 0)
             {
                 var result = comport.ReadExisting();
-                if (result.Contains("ok", StringComparison.OrdinalIgnoreCase)) this.gotOk = true;
+                if (result.Contains("ok", StringComparison.OrdinalIgnoreCase)) this.receivedSerialOkResult = true;
             }
         }
         
