@@ -8,28 +8,27 @@
 // Licensed under MIT License
 
 using GCodePlotter.Plotting;
-using GCodePlotter.Text2Path;
-using System;
 using System.Threading.Tasks;
 
 namespace GCodePlotter.Plotter
 {
-    public interface IPlotter : IDisposable
+    public interface IManualMovable
     {
-        /// <summary>
-        /// the title of the plotter
-        /// </summary>
-        string Name { get; }
-
         /// <summary>
         /// makes the plotter ready to plot
         /// </summary>
         /// <returns></returns>
         Task<PlotResult> GetReady();
 
+
         /// <summary>
-        /// plots the given path
+        /// Calibrates the plotter hardware
         /// </summary>
-        Task<PlotResult> PlotPath(double x, double y, PlotPath path);
+        Task<PlotResult> AutoHome();
+
+        /// <summary>
+        /// Moves to plotter to this coordinates in mm
+        /// </summary>
+        Task<PlotResult> MovoTo(double x, double y);
     }
 }

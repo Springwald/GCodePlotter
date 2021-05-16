@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace GCodePlotter.Plotting
 {
-    public class SovolS01Plotter : IPlotter
+    public class SovolS01Plotter : IPlotter, IManualMovable
     {
         private string comPortName;
         private double actualX = double.MaxValue;
@@ -31,25 +31,31 @@ namespace GCodePlotter.Plotting
 
         public async Task<PlotResult> GetReady()
         {
-            var hardware = new SovolS01Hardware();
-            try
+            if (this.plotterHardware == null)
             {
-                await hardware.Init(this.comPortName, autoHome: true);
+                var hardware = new SovolS01Hardware();
+                try
+                {
+                    await hardware.Init(this.comPortName, autoHome: false);
+                }
+                catch (Exception e)
+                {
+                    return new PlotResult { Success = false, ErrorMessage = e.Message };
+                }
+                this.plotterHardware = hardware;
+                await this.plotterHardware.PenUp();
+                await this.plotterHardware.TravelSpeed();
             }
-            catch (Exception e)
-            {
-                return new PlotResult { Success = false, ErrorMessage = e.Message };
-            }
-            this.plotterHardware = hardware;
-            await this.plotterHardware.PenUp();
-            await this.plotterHardware.TravelSpeed();
             return new PlotResult { Success = true };
         }
 
 
-        public async Task PlotPath(double x, double y, PlotPath path)
+        public async Task<PlotResult> PlotPath(double x, double y, PlotPath path)
         {
-            if (path.Points.Length < 2) return;
+            var ready = await this.GetReady();
+            if (!ready.Success) return ready;
+
+            if (path.Points.Length < 2) return new PlotResult { Success = false, ErrorMessage = "path contains less than 2 points" };
 
             for (int i = 0; i < path.Points.Length; i++)
             {
@@ -74,6 +80,7 @@ namespace GCodePlotter.Plotting
                 this.actualY = plotY;
                 if (this.plotterHardware.PenIsUp) await this.plotterHardware.PenDown();
             }
+            return new PlotResult { Success = true };
         }
 
         public async void Dispose()
@@ -82,6 +89,36 @@ namespace GCodePlotter.Plotting
             await this.plotterHardware?.MoveTo(0, 0);
             this.plotterHardware?.Dispose();
             this.plotterHardware = null;
+        }
+
+        public async Task<PlotResult> AutoHome()
+        {
+            var ready = await this.GetReady();
+            if (!ready.Success) return ready;
+            try
+            {
+                await this.plotterHardware.AutoHome();
+            }
+            catch (Exception e)
+            {
+                return new PlotResult { Success = false, ErrorMessage = e.Message };
+            }
+            return new PlotResult { Success = true };
+        }
+
+        public async Task<PlotResult> MovoTo(double x, double y)
+        {
+            var ready = await this.GetReady();
+            if (!ready.Success) return ready;
+            try
+            {
+                await this.plotterHardware.MoveTo(x, y);
+            }
+            catch (Exception e)
+            {
+                return new PlotResult { Success = false, ErrorMessage = e.Message };
+            }
+            return new PlotResult { Success = true };
         }
     }
 }

@@ -23,13 +23,13 @@ namespace GCodeFontPainter
     /// </summary>
     public partial class MainWindow : Window
     {
-        private int redrawPreviewCounter;
+        private int redrawPreviewCounter; // to prevent overlapping preview rendering
 
-        private IPlotter plotterRealHardware;
-        private ScreenPlotter plotterScreenPreview;
-        private ScreenPlotter plotterScreenLivePlot;
-        private PlotJobRunner actualRobRunner;
-        private PlotJob plotJobFromControlValues;
+        private IPlotter plotterRealHardware;           // the real hardware plotter
+        private ScreenPlotter plotterScreenPreview;     // virtual preview plotter
+        private ScreenPlotter plotterScreenLivePlot;    // virtual live progress view plotter
+        private PlotJobRunner actualRobRunner;          // the actual plot job runner
+        private PlotJob plotJobFromControlValues;       // values for a plot job taken from the control inputs
 
         private bool loaded = false;
 
@@ -64,6 +64,9 @@ namespace GCodeFontPainter
             this.plotterRealHardware?.Dispose();
         }
 
+        /// <summary>
+        /// Only numbers allowed in this text input
+        /// </summary>
         private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
         {
             Regex regex = new Regex("[^0-9]+");
@@ -82,9 +85,9 @@ namespace GCodeFontPainter
         private async Task RecalculateSizes()
         {
             if (!loaded) return;
-            if (int.TryParse(this.WidthInput.Text, out int width)) this.MyPreviewRenderer.WidthMillimeter = Math.Max(5, width);
-            if (int.TryParse(this.HeightInput.Text, out int height)) this.MyPreviewRenderer.HeightMillimeter = Math.Max(5, height);
-            if (int.TryParse(this.RasterSizeInput.Text, out int raster)) this.MyPreviewRenderer.RasterMillimeter = Math.Max(1, raster);
+            if (int.TryParse(this.WidthInput.Text, out int width)) this.plotJobFromControlValues.LineWidthMillimeters = this.MyPreviewRenderer.WidthMillimeter = Math.Min(500, Math.Max(5, width));
+            if (int.TryParse(this.HeightInput.Text, out int height)) this.MyPreviewRenderer.HeightMillimeter = Math.Min(1000, Math.Max(5, height));
+            if (int.TryParse(this.RasterSizeInput.Text, out int raster)) this.MyPreviewRenderer.RasterMillimeter = Math.Min(50, Math.Max(1, raster));
             this.plotterScreenLivePlot.ZoomFactor = this.MyPreviewRenderer.ZoomFactor;
             this.plotterScreenPreview.ZoomFactor = this.MyPreviewRenderer.ZoomFactor;
             await this.MyPreviewRenderer.UpdateRaster();
@@ -97,7 +100,7 @@ namespace GCodeFontPainter
             if (!loaded) return;
             this.plotJobFromControlValues.Text = TextInput.Text;
             this.plotJobFromControlValues.FontName = this.MyFontSelector.FontName;
-            if (int.TryParse(this.FontSizeInput.Text, out int fontSize)) this.plotJobFromControlValues.FontSizeMillimeters = Math.Max(2, fontSize);
+            if (int.TryParse(this.FontSizeInput.Text, out int fontSize)) this.plotJobFromControlValues.FontSizeMillimeters = Math.Min(200,Math.Max(2, fontSize));
             await this.MyPreviewRenderer.ClearLiveView();
             await this.DrawPreview();
         }
@@ -113,10 +116,12 @@ namespace GCodeFontPainter
 
         #region Action buttons
 
-        private async void ButtonPlot_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Connect to the real plotter hardware
+        /// </summary>
+        private async void ButtonConnect_Click(object sender, RoutedEventArgs e)
         {
-            this.plotterScreenLivePlot.DelayMsPerPath = 0;
-
+            this.ButtonConnect.IsEnabled = false;
             if (this.plotterRealHardware == null)
             {
                 // set up plotter hardware
@@ -124,33 +129,71 @@ namespace GCodeFontPainter
                 if (string.IsNullOrWhiteSpace(comportName))
                 {
                     MessageBox.Show("No COM port name entered!");
+                    this.ButtonConnect.IsEnabled = true;
                     return;
                 }
                 var hardware = new SovolS01Plotter(comportName);
-                var result = await plotterRealHardware.GetReady();
+                var result = await hardware.GetReady();
                 if (result.Success == false)
                 {
                     MessageBox.Show($"Error set up plotter on port '{comportName}':{result.ErrorMessage}");
+                    this.ButtonConnect.IsEnabled = true;
                     return;
                 }
                 this.plotterRealHardware = hardware;
+                this.ManualMover.Plotter = hardware;
                 this.ComPortInput.IsEnabled = false; // can't change com port after init
+                this.PositionBox.IsEnabled = true;
+                this.ButtonPlot.IsEnabled = true;
             }
-            await this.RunJob(new[] { plotterScreenLivePlot, plotterRealHardware }, this.plotJobFromControlValues);
+        }
+        
+        /// <summary>
+        /// Run the plot job on the real plotter hardware
+        /// </summary>
+        private async void ButtonPlot_Click(object sender, RoutedEventArgs e)
+        {
+            this.plotterScreenLivePlot.DelayMsPerPath = 0;
+
+            if (int.TryParse(this.StartPosXInput.Text, out int x))
+            {
+                if (int.TryParse(this.StartPosYInput.Text, out int y))
+                {
+                    await this.RunJob(new[] { plotterScreenLivePlot, plotterRealHardware }, this.plotJobFromControlValues);
+                }
+            }
         }
 
+        /// <summary>
+        /// Simulate the plot job virtual on screen
+        /// </summary>
         private async void ButtonSimulate_Click(object sender, RoutedEventArgs e)
         {
             this.plotterScreenLivePlot.DelayMsPerPath = 25;
             await this.RunJob(new[] { this.plotterScreenLivePlot }, this.plotJobFromControlValues);
         }
 
+        /// <summary>
+        /// Stop the actual plot job
+        /// </summary>
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) => this.actualRobRunner?.CancelJob();
+
+        /// <summary>
+        /// Take the manual plotter position as origin of the plot job
+        /// </summary>
+        private void ButtonUseAsStartPos_Click(object sender, RoutedEventArgs e)
+        {
+            this.StartPosXInput.Text = ((int)ManualMover.ActualX).ToString();
+            this.StartPosYInput.Text = ((int)ManualMover.ActualY).ToString();
+        }
 
         #endregion
 
         #region job running
 
+        /// <summary>
+        /// Run the given job on the given plotters
+        /// </summary>
         private async Task RunJob(IPlotter[] plotters, PlotJob plotJob)
         {
             this.SetRunStatus(true);
@@ -166,18 +209,18 @@ namespace GCodeFontPainter
             this.SetRunStatus(false);
         }
 
-        public void SetRunStatus(bool running)
+        /// <summary>
+        /// Enables or disables the buttons due to the actual 
+        /// </summary>
+        /// <param name="running"></param>
+        private void SetRunStatus(bool running)
         {
             this.Editor.IsEnabled = !running;
             this.ButtonSimulate.IsEnabled = !running;
-            this.ButtonPlot.IsEnabled = !running;
+            this.ButtonPlot.IsEnabled = this.plotterRealHardware != null &&  running == false;
             this.ButtonCancel.IsEnabled = running;
-
         }
 
-
         #endregion
-
-       
     }
 }

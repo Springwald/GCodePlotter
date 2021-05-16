@@ -7,7 +7,6 @@
 // All rights reserved
 // Licensed under MIT License
 
-using GCodePlotter.Text2Path;
 using System;
 using System.Threading.Tasks;
 using System.Windows;
@@ -30,7 +29,7 @@ namespace GCodePlotter
         /// <summary>
         /// Scale factor to fit the drawing into the control
         /// </summary>
-        public double ZoomFactor => Math.Min((this.ActualWidth - drawingAreaMargin*2) / WidthMillimeter, (this.ActualHeight - drawingAreaMargin * 2) / HeightMillimeter);
+        public double ZoomFactor => Math.Min((this.ActualWidth - drawingAreaMargin * 2) / WidthMillimeter, (this.ActualHeight - drawingAreaMargin * 2) / HeightMillimeter);
 
         /// <summary>
         /// drawing area width in millimeter
@@ -84,11 +83,11 @@ namespace GCodePlotter
 
         public async Task UpdateRaster()
         {
-          
+
             var zoom = this.ZoomFactor;
 
-            var width = this.DrawingArea.Width = Math.Max(10, this.WidthMillimeter * zoom) - this.drawingAreaMargin * 2;
-            var height = this.DrawingArea.Height = Math.Max(10, this.HeightMillimeter * zoom) - this.drawingAreaMargin * 2;
+            var width = this.DrawingArea.Width = Math.Max(10, this.WidthMillimeter * zoom - this.drawingAreaMargin * 2);
+            var height = this.DrawingArea.Height = Math.Max(10, this.HeightMillimeter * zoom - this.drawingAreaMargin * 2);
             this.RasterCanvas.Children.Clear();
 
             var brush = Brushes.Beige;

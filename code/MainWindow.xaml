@@ -21,11 +21,13 @@
                     </Grid.ColumnDefinitions>
                     <GroupBox Grid.Column="0">
                         <GroupBox.Header>
-                            <Label FontSize="18" FontWeight="Bold">Plot</Label>
+                            <Label FontSize="18" FontWeight="Bold">Plotter</Label>
                         </GroupBox.Header>
                         <StackPanel>
                             <Label>Plotter COM port:</Label>
                             <TextBox Name="ComPortInput" Text="COM6"/>
+                            <Button Content="connect" Name="ButtonConnect"  Margin="5" Click="ButtonConnect_Click"/>
+                            
                             <Label>Start position in mm:</Label>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -35,22 +37,24 @@
                                     <ColumnDefinition></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
                                 <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center">X:</Label>
-                                <TextBox Grid.Row="0" Grid.Column="1" Name="StartPosXInput" VerticalAlignment="Center" Text="10"/>
+                                <TextBox Grid.Row="0" Grid.Column="1" Name="StartPosXInput" VerticalAlignment="Center" PreviewTextInput="NumberValidationTextBox" Text="10"/>
                                 <Label Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" >Y:</Label>
-                                <TextBox Grid.Row="0" Grid.Column="3" Name="StartPosYInput" Text="140" VerticalAlignment="Center"/>
+                                <TextBox Grid.Row="0" Grid.Column="3" Name="StartPosYInput" Text="140" PreviewTextInput="NumberValidationTextBox" VerticalAlignment="Center"/>
                             </Grid>
 
-                            <Button Content="Simulate" Name="ButtonSimulate"  Margin="5" Click="ButtonSimulate_Click"/>
-                            <Button Content="Plot"  Name="ButtonPlot" Margin="5" Click="ButtonPlot_Click" Background="#FFCBFCCD"/>
+                            <Button Content="Simulate" Name="ButtonSimulate"  Margin="5"  Click="ButtonSimulate_Click"/>
+                            <Button Content="Plot"  Name="ButtonPlot" Margin="5" Click="ButtonPlot_Click" IsEnabled="False"  Background="#FFCBFCCD"/>
                             <Button Content="Cancel" Name="ButtonCancel" Margin="5"  Background="#FFFCBABA" IsEnabled="False" Click="ButtonCancel_Click"/>
                         </StackPanel>
                     </GroupBox>
-                    <GroupBox Grid.Column="1">
+                    <GroupBox Grid.Column="1" IsEnabled="False" Name="PositionBox" >
                         <GroupBox.Header>
                             <Label FontSize="18" FontWeight="Bold">Position</Label>
                         </GroupBox.Header>
-                        <Controls:ManualMove x:Name="ManualMover"/>
-
+                        <StackPanel>
+                            <Button Grid.Row="0" Grid.Column="2" Content="Use as start pos" Name="ButtonUseAsStartPos"  Margin="5" Click="ButtonUseAsStartPos_Click"/>
+                            <Controls:ManualMove x:Name="ManualMover"/>
+                        </StackPanel>
                     </GroupBox>
                 </Grid>
                 <Grid>

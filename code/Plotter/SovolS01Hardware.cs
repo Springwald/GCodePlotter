@@ -33,7 +33,18 @@ namespace GCodeFontPainter
             comport.DtrEnable = true;
             comport.PortName = comPort;
             comport.DataReceived += Comport_DataReceived;
-            comport.Open();
+            try
+            {
+                comport.Open();
+            } catch(Exception e)
+            {
+                try
+                {
+                    comport.Close();
+                }
+                catch(Exception) { }
+                throw;
+            }
 
             await this.SendComCommand("G90"); // set all axes to absolute
             await this.SendComCommand("G21"); // set units to millimeters

@@ -9,10 +9,6 @@
 
 using GCodePlotter.Plotting;
 using GCodePlotter.Text2Path;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -42,13 +38,13 @@ namespace GCodePlotter.Plotter
 
         public async Task<PlotResult> GetReady() { await Task.CompletedTask; return new PlotResult { Success = true }; }
 
-        public async Task PlotPath(double x, double y, PlotPath path)
+        public async Task<PlotResult> PlotPath(double x, double y, PlotPath path)
         {
             var zoom = this.ZoomFactor;
             for (int i = 0; i < path.Points.Length - 1; i++)
             {
-               canvas.Children.Add(
-               new Line()
+                canvas.Children.Add(
+                new Line()
                 {
                     Stroke = this.paintBrush,
                     StrokeThickness = strokeThickness,
@@ -59,6 +55,7 @@ namespace GCodePlotter.Plotter
                 });
             }
             if (this.DelayMsPerPath > 0) await Task.Delay(DelayMsPerPath);
+            return new PlotResult { Success = true };
         }
 
         public void CancelPlot() { }
