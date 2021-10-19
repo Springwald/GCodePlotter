@@ -45,6 +45,8 @@ namespace GCodePlotter.Plotting
                 }
             }
 
+            
+
             if (canceled)
             {
                 return new PlotResult { Success = false, ErrorMessage = "Job canceled" };

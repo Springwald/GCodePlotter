@@ -9,8 +9,6 @@
 
 using GCodePlotter.Plotting;
 using GCodePlotter.Text2Path;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -63,10 +61,14 @@ namespace GCodePlotter.Plotter
             x = 0;
             y = 0;
 
-            var points = this.FastPreview && path.Points.Length > 2 ? this.SimplifyPathsPoints(path.Points).ToArray() : path.Points;
+            var points = path.Points.Length <= 2 ? path.Points.ToArray() :
+                (this.FastPreview ?
+                    PathSimplifier.SimplifyPathsPoints(path.Points, tolerance: PathSimplifier.ScreenFastTolerance).ToArray() :
+                    PathSimplifier.SimplifyPathsPoints(path.Points, tolerance: PathSimplifier.PlotTolerance).ToArray()
+                );
 
             var zoom = this.ZoomFactor;
-            for (int i = 0; i < points.Length-1; i++)
+            for (int i = 0; i < points.Length - 1; i++)
             {
                 canvas.Children.Add(
                 new Line()
@@ -83,47 +85,6 @@ namespace GCodePlotter.Plotter
             return new PlotResult { Success = true };
         }
 
-        /// <summary>
-        /// enable fast path preview by less points in path
-        /// </summary>
-        private IEnumerable<PlotPoint> SimplifyPathsPoints(PlotPoint[] points)
-        {
-            var tolerance = 0.51d;
-
-            if (points.Length < 3)
-            {
-                foreach (var p in points) yield return p;
-                yield break;
-            }
-
-            yield return points.First();
-
-            var lastGradient = 0d;
-            var gradientLastToActual = 0d;
-
-            for (int i = 0; i < points.Length - 1; i++)
-            {
-                var x = (points[i + 1].X - points[i].X);
-                var y = (points[i + 1].Y - points[i].Y);
-                if (y == 0)
-                {
-                    gradientLastToActual = double.PositiveInfinity;
-                }
-                else
-                {
-                    gradientLastToActual = x / y;
-                }
-
-                var diff = Math.Abs(gradientLastToActual - lastGradient);
-                if (i == 0 || diff >= tolerance)
-                {
-                    yield return points[i + 1];
-                }
-                lastGradient = gradientLastToActual;
-            }
-
-            yield return points.Last(); ;
-        }
 
 
         public void CancelPlot() { }

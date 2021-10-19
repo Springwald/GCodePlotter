@@ -36,16 +36,17 @@ namespace GCodeFontPainter
             try
             {
                 comport.Open();
-            } catch(Exception e)
+            } catch (Exception e)
             {
                 try
                 {
                     comport.Close();
                 }
-                catch(Exception) { }
+                catch (Exception) { }
                 throw;
             }
 
+            await Task.Delay(500);
             await this.SendComCommand("G90"); // set all axes to absolute
             await this.SendComCommand("G21"); // set units to millimeters
             await this.Pen(Pens.up);
@@ -65,7 +66,7 @@ namespace GCodeFontPainter
 
         public async Task MoveTo(double x, double y) => await this.SendComCommand($"G1 X{x:0.###} Y{y:0.###}".Replace(",", "."));
         public async Task AutoHome() => await this.SendComCommand($"G28");
-        public async Task PaintSpeed() => await this.SendComCommand("G1 F3000"); // speed rate
+        public async Task PaintSpeed() => await this.SendComCommand("G1 F6000"); // speed rate
         public async Task TravelSpeed() => await this.SendComCommand("G1 F10000"); // speed rate
 
         public void Dispose()

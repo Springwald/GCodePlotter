@@ -31,6 +31,7 @@ namespace GCodePlotter.Text2Path
             var space = this.GetWidth("A A") - this.GetWidth("AA"); // workaround because " " alone is width 0
             foreach (var line in lines)
             {
+                if (line == " ") yield return line; // force new line
                 if (lineWrap) // Wrap text at end of line
                 {
                     var lineResult = new StringBuilder();

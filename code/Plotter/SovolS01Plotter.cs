@@ -11,6 +11,7 @@ using GCodeFontPainter;
 using GCodePlotter.Plotter;
 using GCodePlotter.Text2Path;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace GCodePlotter.Plotting
@@ -55,12 +56,16 @@ namespace GCodePlotter.Plotting
             var ready = await this.GetReady();
             if (!ready.Success) return ready;
 
-            if (path.Points.Length < 2) return new PlotResult { Success = false, ErrorMessage = "path contains less than 2 points" };
+            bool fast = true; // simplify the path?
 
-            for (int i = 0; i < path.Points.Length; i++)
+            var points = fast && path.Points.Length > 2 ? PathSimplifier.SimplifyPathsPoints(path.Points, tolerance: PathSimplifier.PlotTolerance).ToArray() : path.Points;
+
+            if (points.Length < 2) return new PlotResult { Success = false, ErrorMessage = "path contains less than 2 points" };
+
+            for (int i = 0; i < points.Length; i++)
             {
-                var plotX = x + path.Points[i].X;
-                var plotY = y - path.Points[i].Y;
+                var plotX = x + points[i].X;
+                var plotY = y - points[i].Y;
 
                 if (i == 0)
                 {
@@ -80,6 +85,9 @@ namespace GCodePlotter.Plotting
                 this.actualY = plotY;
                 if (this.plotterHardware.PenIsUp) await this.plotterHardware.PenDown();
             }
+
+            if (!this.plotterHardware.PenIsUp) await this.plotterHardware.PenUp();
+
             return new PlotResult { Success = true };
         }
 
