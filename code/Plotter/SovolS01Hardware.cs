@@ -16,12 +16,19 @@ namespace GCodeFontPainter
 {
     public class SovolS01Hardware : IDisposable
     {
+        /// <summary>
+        /// How long to wait on ok result?
+        /// </summary>
+        private int timeoutMs = 20000;
+
         public enum Pens { up, down };
 
         private SerialPort comport;
         private bool receivedSerialOkResult;
 
         public bool PenIsUp { get; private set; }
+
+        public bool WasTimeout { get; private set; }
 
         public async Task Init(string comPort, bool autoHome)
         {
@@ -80,9 +87,22 @@ namespace GCodeFontPainter
 
         private async Task SendComCommand(string command)
         {
+            
             Debug.WriteLine(command);
             this.comport.WriteLine(command);
-            while (!this.receivedSerialOkResult) await Task.Delay(1);
+            this.WasTimeout = false;
+            var waitMs = 0;
+            var timeout = false;
+            while (!this.receivedSerialOkResult && !timeout)
+            {
+                await Task.Delay(1);
+                if (waitMs++ > timeoutMs) timeout = true;
+            }
+            if (timeout)
+            {
+                // todo: maybe: special timeout handling?
+                this.WasTimeout = true;
+            }
             this.receivedSerialOkResult = false;
         }
 
