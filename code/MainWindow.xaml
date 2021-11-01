@@ -39,7 +39,7 @@
                                 <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center">X:</Label>
                                 <TextBox Grid.Row="0" Grid.Column="1" Name="StartPosXInput" VerticalAlignment="Center" PreviewTextInput="NumberValidationTextBox" Text="10"/>
                                 <Label Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" >Y:</Label>
-                                <TextBox Grid.Row="0" Grid.Column="3" Name="StartPosYInput" Text="140" PreviewTextInput="NumberValidationTextBox" VerticalAlignment="Center"/>
+                                <TextBox Grid.Row="0" Grid.Column="3" Name="StartPosYInput" Text="250" PreviewTextInput="NumberValidationTextBox" VerticalAlignment="Center"/>
                             </Grid>
 
                             <Button Content="Simulate" Name="ButtonSimulate"  Margin="5"  Click="ButtonSimulate_Click"/>
@@ -84,7 +84,7 @@
                         </GroupBox.Header>
                         <StackPanel>
                             <Label>Font size:</Label>
-                            <TextBox Name="FontSizeInput" Text="9" PreviewTextInput="NumberValidationTextBox" TextChanged="ValuesChanged"/>
+                            <TextBox Name="FontSizeInput" Text="8" PreviewTextInput="NumberValidationTextBox" TextChanged="ValuesChanged"/>
                             <Label>Font name:</Label>
                             <Controls:FontSelector x:Name="MyFontSelector" FontChanged="MyFontSelector_FontChanged"   />
                         </StackPanel>
