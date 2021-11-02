@@ -80,7 +80,28 @@ namespace GCodePlotter.Plotting
                         await this.plotterHardware.TravelSpeed();
                     }
                 }
-                await this.plotterHardware.MoveTo(plotX, plotY);
+                if (!await this.plotterHardware.MoveTo(plotX, plotY)) 
+                {
+                    // timeout happened, try again!
+                    await Task.Delay(10000); // Wait for the plotter com port to set up
+
+                    var penWasDown = !this.plotterHardware.PenIsUp;
+
+                    await this.plotterHardware.PenUp();
+                    await this.plotterHardware.AutoHome();
+                    this.actualX = 0; 
+                    this.actualY = 0;
+
+                    if (await this.plotterHardware.MoveTo(plotX, plotY))
+                    {
+                        if (penWasDown) await this.plotterHardware.PenDown();
+                    } else
+                    {
+                        // timeout happened again 😱
+                        throw new Exception("unable to fix timeout problem!");
+                    }
+
+                }
                 this.actualX = plotX;
                 this.actualY = plotY;
                 if (this.plotterHardware.PenIsUp) await this.plotterHardware.PenDown();

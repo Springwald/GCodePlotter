@@ -19,10 +19,11 @@ namespace GCodeFontPainter
         /// <summary>
         /// How long to wait on ok result?
         /// </summary>
-        private int timeoutMs = 20000;
+        private int timeoutMs = 1000;
 
         public enum Pens { up, down };
 
+        private string portName;
         private SerialPort comport;
         private bool receivedSerialOkResult;
 
@@ -30,15 +31,17 @@ namespace GCodeFontPainter
 
         public bool WasTimeout { get; private set; }
 
-        public async Task Init(string comPort, bool autoHome)
+        public async Task Init(string portName, bool autoHome)
         {
+            this.portName = portName;
+
             comport = new SerialPort();
 
             if (comport.IsOpen) comport.Close();
 
             comport.BaudRate = 115200;
             comport.DtrEnable = true;
-            comport.PortName = comPort;
+            comport.PortName = portName;
             comport.DataReceived += Comport_DataReceived;
             try
             {
@@ -71,7 +74,7 @@ namespace GCodeFontPainter
             this.PenIsUp = pen == Pens.up;
         }
 
-        public async Task MoveTo(double x, double y) => await this.SendComCommand($"G1 X{x:0.###} Y{y:0.###}".Replace(",", "."));
+        public async Task<bool> MoveTo(double x, double y) => await this.SendComCommand($"G1 X{x:0.###} Y{y:0.###}".Replace(",", "."));
         public async Task AutoHome() => await this.SendComCommand($"G28");
         public async Task PaintSpeed() => await this.SendComCommand("G1 F6000"); // speed rate
         public async Task TravelSpeed() => await this.SendComCommand("G1 F10000"); // speed rate
@@ -85,10 +88,10 @@ namespace GCodeFontPainter
             }
         }
 
-        private async Task SendComCommand(string command)
+        private async Task<bool> SendComCommand(string command)
         {
-            
             Debug.WriteLine(command);
+            //await Task.Delay(1);
             this.comport.WriteLine(command);
             this.WasTimeout = false;
             var waitMs = 0;
@@ -101,10 +104,33 @@ namespace GCodeFontPainter
             if (timeout)
             {
                 // todo: maybe: special timeout handling?
-                this.WasTimeout = true;
+                Debug.WriteLine("## Timeout! Try again... ##");
+                this.comport.WriteLine(command);
+                await Task.Delay(100);
+                timeout = false;
+                waitMs = 0;
+                while (!this.receivedSerialOkResult && !timeout)
+                {
+                    await Task.Delay(1);
+                    if (waitMs++ > timeoutMs) timeout = true;
+                }
+
+                if (timeout)
+                {
+                    this.WasTimeout = true;
+                    Debug.WriteLine("#### Timeout! Final failure! ####");
+                    comport.Close();
+                    this.comport = null;
+                    await Task.Delay(10000);
+                    await this.Init(this.portName, autoHome: true);
+                    await Task.Delay(10000);
+                }
             }
             this.receivedSerialOkResult = false;
+            return !timeout;
         }
+
+
 
         private void Comport_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
